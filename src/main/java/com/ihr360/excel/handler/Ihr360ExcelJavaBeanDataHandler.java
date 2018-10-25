@@ -4,6 +4,8 @@ import com.ihr360.excel.CatcheExcelI18nProps;
 import com.ihr360.excel.annotation.ExcelCell;
 import com.ihr360.excel.annotation.ExcelConfig;
 import com.ihr360.excel.annotation.RowNumberField;
+import com.ihr360.excel.context.Ihr360ImportExcelContext;
+import com.ihr360.excel.context.Ihr360ImportExcelContextHolder;
 import com.ihr360.excel.exception.ExcelCanHandleException;
 import com.ihr360.excel.exception.ExcelDateParseException;
 import com.ihr360.excel.exception.ExcelException;
@@ -45,8 +47,9 @@ public class Ihr360ExcelJavaBeanDataHandler {
     private static Logger logger = LoggerFactory.getLogger(Ihr360ExcelJavaBeanDataHandler.class);
 
 
-    public static <T> T handleImportExcelRowToJavabean(ImportParams<T> importParams, Map<String, Integer> fileHeaderIndexMap, List<ExcelLogItem> rowLogs, Row row) {
-
+    public static <T> T handleImportExcelRowToJavabean(Map<String, Integer> fileHeaderIndexMap, List<ExcelLogItem> rowLogs, Row row) {
+        Ihr360ImportExcelContext<T> excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
+        ImportParams<T> importParams = excelContext.getImportParams();
         Class<T> clazz = importParams.getImportType();
         Map<String, List<String>> importHeader = importParams.getImportHeader();
         ExcelConfig excelConfig = clazz.getAnnotation(ExcelConfig.class);
@@ -204,7 +207,7 @@ public class Ihr360ExcelJavaBeanDataHandler {
                             continue;
                         }
                         try {
-                            Ihr360ExcelSheetHandler.addCellDataToMap(flexFieldDataMap, header, cell, type);
+                            Ihr360ExcelCellHandler.addCellDataToMap(flexFieldDataMap, header, cell, type);
                         } catch (ParseException e) {
                             rowLogs.add(ExcelLogItem.createExcelItem(ExcelLogType.ROW_COLUMN_FIELD_DATA_TYPE_ERR, new String[]{row.getRowNum() + 1 + "", header}, index));
                             continue;
@@ -215,7 +218,7 @@ public class Ihr360ExcelJavaBeanDataHandler {
 
                     } else {
                         try {
-                            Ihr360ExcelSheetHandler.addCellDataToMap(flexFieldDataMap, header, cell, null);
+                            Ihr360ExcelCellHandler.addCellDataToMap(flexFieldDataMap, header, cell, null);
                         } catch (ParseException | IllegalArgumentException e) {
                             rowLogs.add(ExcelLogItem.createExcelItem(ExcelLogType.ROW_COLUMN_FIELD_DATA_TYPE_ERR, new String[]{row.getRowNum() + 1 + "", header}, index));
                         }

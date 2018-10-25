@@ -1,6 +1,8 @@
 package com.ihr360.excel.handler;
 
 import com.ihr360.excel.constants.ExcelDefaultConfig;
+import com.ihr360.excel.context.Ihr360ImportExcelContext;
+import com.ihr360.excel.context.Ihr360ImportExcelContextHolder;
 import com.ihr360.excel.metaData.ImportParams;
 import com.ihr360.excel.specification.CommonSpecification;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +16,9 @@ import java.util.Map;
  */
 public class Ihr360ExcelSpecificationHandler {
 
-    public static <T> void handleCommonSpecification(ImportParams<T> importParams, Row row, Map<String, Object> map) {
+    public static <T> void handleCommonSpecification(Row row, Map<String, Object> map) {
+        Ihr360ImportExcelContext<T> excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
+        ImportParams importParams = excelContext.getImportParams();
         CommonSpecification commonSpecification = importParams.getCommonSpecification();
         if (commonSpecification != null && commonSpecification.isShowRowNum()) {
             String rowNumKey = StringUtils.isEmpty(commonSpecification.getRowNumKey())

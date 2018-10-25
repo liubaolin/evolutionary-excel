@@ -9,11 +9,9 @@ import com.ihr360.excel.config.Ihr360TemplateExcelConfiguration;
 import com.ihr360.excel.context.Ihr360ImportExcelContext;
 import com.ihr360.excel.context.Ihr360ImportExcelContextHolder;
 import com.ihr360.excel.exception.ExcelException;
-import com.ihr360.excel.handler.Ihr360ExcelCellHandler;
-import com.ihr360.excel.handler.Ihr360ExcelJavaBeanDataHandler;
+import com.ihr360.excel.handler.Ihr360ExcelHandlerManager;
 import com.ihr360.excel.handler.Ihr360ExcelRowUtil;
-import com.ihr360.excel.handler.Ihr360ExcelSpecificationHandler;
-import com.ihr360.excel.handler.Ihr360ExcelValidatorHandler;
+import com.ihr360.excel.handler.Ihr360ImportExcelProcessor;
 import com.ihr360.excel.logs.ExcelCommonLog;
 import com.ihr360.excel.logs.ExcelLogItem;
 import com.ihr360.excel.logs.ExcelLogType;
@@ -23,11 +21,9 @@ import com.ihr360.excel.metaData.CellComment;
 import com.ihr360.excel.metaData.ImportParams;
 import com.ihr360.excel.specification.CommonSpecification;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Comment;
@@ -44,17 +40,12 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.ihr360.excel.handler.Ihr360ExcelValidatorHandler.judgeHeader;
 
 
 /**
@@ -95,7 +86,7 @@ public class Ihr360ExcelImportUtil {
             CommonSpecification commonSpecification = importParams.getCommonSpecification();
             commonSpecification.setTemplateHeaderRowNums(ihr360TemplateExcelConfiguration.getTemplateHeaderRowNums());
             commonSpecification.setTemplateDataBeginRowNum(ihr360TemplateExcelConfiguration.getTemplateDataBeginRowNum());
-            commonSpecification.setTemplateHeaders(ihr360TemplateExcelConfiguration.getTemplateHeaders());
+            commonSpecification.setTemplateHeaderIndexTitleMap(ihr360TemplateExcelConfiguration.getTemplateHeaders());
         } else {
             // todo
         }
@@ -103,178 +94,22 @@ public class Ihr360ExcelImportUtil {
         return importExcel(importParams, inputStream);
     }
 
-    /**
-     * 历史版本，不建议使用，可使用  {@link #importExcel(ExcelConfigurer excelConfigurer, InputStream inputStream)}
-     *
-     * @param <T>
-     * @return
-     */
-    @Deprecated
-    public static <T> Collection<T> importExcel() {
+    private static <T> Collection<T> importExcel() {
 
+        Ihr360ExcelHandlerManager<T> processorManager = new Ihr360ExcelHandlerManager();
+
+        Collection<T> resultList = Lists.newArrayList();
+        for (Ihr360ImportExcelProcessor<T> processor : processorManager.getProcessors()) {
+            processor.doProcess();
+            resultList = processor.getResult();
+            if (processor.isBack()) {
+                return resultList;
+            }
+        }
+        
         Ihr360ImportExcelContext<T> ihr360ImportExcelContext = Ihr360ImportExcelContextHolder.getExcelContext();
-        ImportParams<T> importParams = ihr360ImportExcelContext.getImportParams();
         ExcelLogs logs = ihr360ImportExcelContext.getLogs();
-        Class<T> clazz = importParams.getImportType();
-
-        Sheet sheet = ihr360ImportExcelContext.getCurrentSheet();
-        if (sheet == null) {
-            return new ArrayList<>();
-        }
-
-        List<T> resultList = new ArrayList<>();
-        List<ExcelRowLog> rowLogList = new ArrayList<>();
-
-        Iterator<Row> rowIterator = sheet.rowIterator();
-        // 从excel读取的表头 Map<title,index>
-        Map<String, Integer> headerTitleIndexMap = new LinkedHashMap<>();
-        //最后的连续空行忽略
-        List<ExcelRowLog> tempEmptyLogList = new ArrayList<>();
-
-        CommonSpecification commonSpecification = importParams.getCommonSpecification();
-
-        List<List<String>> headerJudgeList = Lists.newArrayList();
-        if (commonSpecification != null) {
-            headerJudgeList = commonSpecification.getHeaderColumnJudge();
-            if (MapUtils.isNotEmpty(commonSpecification.getTemplateHeaders())) {
-                headerTitleIndexMap = commonSpecification.getTemplateHeaders();
-            }
-        }
-
-        Row headerRow = null;
-        List<Integer> convertedHeaderRows = Lists.newArrayList();
-        while (rowIterator.hasNext()) {
-
-            Row row = rowIterator.next();
-
-            if (Ihr360ExcelRowUtil.ignorImportRow(row) && commonSpecification.getTemplateHeaders().size() != convertedHeaderRows.size()) {
-                continue;
-            }
-
-            boolean isBlankRow = Ihr360ExcelRowUtil.checkBlankRow(row);
-            boolean isTemplateHeaderRow = Ihr360ExcelRowUtil.isTemplateHeaderRow(row);
-            List<ExcelLogItem> rowLogItems = new ArrayList<>();
-
-            //处理表头
-            if (isTemplateHeaderRow) {
-                headerTitleIndexMap = getHeaderIndexTitleMap(headerTitleIndexMap, convertedHeaderRows, headerRow, row);
-                continue;
-            } else if (Ihr360ExcelRowUtil.isHeaderRow(headerRow, row)) {
-                //隐藏行或空行
-                if (Ihr360ExcelRowUtil.isHiddenOrBlanRow(row)) {
-                    rowLogItems.add(ExcelLogItem.createExcelItem(ExcelLogType.FIRST_ROW_RULE, null));
-                    rowLogList.add(new ExcelRowLog(rowLogItems, row.getRowNum() + 1));
-                    break;
-                }
-                headerTitleIndexMap = Ihr360ExcelRowUtil.convertRowToHeaderMap(row);
-                headerRow = row;
-
-                //表头判断
-                boolean isHeader = judgeHeader(headerTitleIndexMap, headerJudgeList);
-
-                if (!isHeader) {
-                    headerRow = null;
-                    rowLogItems.add(ExcelLogItem.createExcelItem(ExcelLogType.IGNORE_ROW, new String[]{row.getRowNum() + 1 + ""}));
-                    rowLogList.add(new ExcelRowLog(rowLogItems, row.getRowNum() + 1));
-                }
-                continue;
-            }
-
-            if (headerRow == null) {
-                continue;
-            }
-
-            //设置headerRowNum
-            if (commonSpecification != null && CollectionUtils.isNotEmpty(commonSpecification.getTemplateHeaderRowNums())) {
-                ihr360ImportExcelContext.setHeaderRowNum(commonSpecification.getTemplateHeaderRowNums().stream().max(Comparator.naturalOrder()).get());
-            } else {
-                ihr360ImportExcelContext.setHeaderRowNum(headerRow.getRowNum());
-            }
-
-
-            //隐藏行
-            if (row.getZeroHeight() && Ihr360ExcelRowUtil.ignorHiddenRows()) {
-                rowLogItems.add(ExcelLogItem.createExcelItem(ExcelLogType.HIDDEN_ROW, new String[]{row.getRowNum() + 1 + ""}));
-                rowLogList.add(new ExcelRowLog(rowLogItems, row.getRowNum() + 1));
-                continue;
-            }
-            //根据规则忽略行
-            List<List<String>> atLeastHeaders = commonSpecification == null ? null : commonSpecification.getAtLeastOneOrIgnoreRow();
-            if (CollectionUtils.isNotEmpty(atLeastHeaders)) {
-                Set<String> headerSet = headerTitleIndexMap.keySet();
-                boolean contains = false;
-                for (List<String> ailiasHeaders : atLeastHeaders) {
-                    if (CollectionUtils.isEmpty(ailiasHeaders)) {
-                        continue;
-                    }
-                    for (String ailiasHeader : ailiasHeaders) {
-                        for (String header : headerSet) {
-                            String headerOld = header;
-                            if (!Ihr360ExcelValidatorHandler.headerEqueals(header, ailiasHeader)) {
-                                continue;
-                            }
-                            Integer index = headerTitleIndexMap.get(headerOld);
-                            Cell cell = row.getCell(index);
-                            if (!Ihr360ExcelCellHandler.isNullOrBlankStringCell(cell)) {
-                                contains = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (contains) {
-                        break;
-                    }
-                }
-                if (!contains) {
-                    rowLogItems.add(ExcelLogItem.createExcelItem(ExcelLogType.IGNORE_ROW, new String[]{row.getRowNum() + 1 + ""}));
-                    rowLogList.add(new ExcelRowLog(rowLogItems, row.getRowNum() + 1));
-                    continue;
-                }
-            }
-
-            // 跳过空行,并记录日志
-            if (isBlankRow) {
-                rowLogItems.add(ExcelLogItem.createExcelItem(ExcelLogType.BLANK_ROW, new String[]{row.getRowNum() + 1 + ""}));
-                tempEmptyLogList.add(new ExcelRowLog(rowLogItems, row.getRowNum() + 1));
-                continue;
-            } else {
-                if (CollectionUtils.isNotEmpty(tempEmptyLogList)) {
-                    rowLogList.addAll(tempEmptyLogList);
-                    tempEmptyLogList.clear();
-                }
-            }
-
-            //输出数据类型是Map时，简单将数据封装为Map<headerName,value>
-            if (clazz == Map.class) {
-                Map<String, Object> map = Ihr360ExcelRowUtil.handleExcelRowToMap(headerTitleIndexMap, row, rowLogItems, importParams.getColumnSpecifications());
-                if (CollectionUtils.isEmpty(rowLogItems)) {
-                    Ihr360ExcelSpecificationHandler.handleCommonSpecification(importParams, row, map);
-                    resultList.add((T) map);
-                } else {
-                    rowLogList.add(new ExcelRowLog(rowLogItems, row.getRowNum() + 1));
-                }
-            } else {
-
-                T excelEntityVo = Ihr360ExcelJavaBeanDataHandler.handleImportExcelRowToJavabean(importParams, headerTitleIndexMap, rowLogItems, row);
-                if (CollectionUtils.isEmpty(rowLogItems)) {
-                    resultList.add(excelEntityVo);
-                } else {
-                    rowLogList.add(new ExcelRowLog(rowLogItems, row.getRowNum() + 1));
-                }
-            }
-        }
-        if (headerRow == null && MapUtils.isEmpty(headerTitleIndexMap) && CollectionUtils.isNotEmpty(headerJudgeList)) {
-            ExcelCommonLog commonLog = new ExcelCommonLog();
-            logs.setExcelCommonLog(commonLog);
-            List<String> headers = headerJudgeList.stream().map(header -> header.get(0)).collect(Collectors.toList());
-
-            List<ExcelLogItem> excelLogItems = Lists.newArrayList();
-            ExcelLogItem excelLogItem = new ExcelLogItem(ExcelLogType.HEADER_REQUIRED, headers.toArray());
-            excelLogItems.add(excelLogItem);
-            commonLog.setExcelLogItems(excelLogItems);
-            return resultList;
-        }
-
+        List<ExcelRowLog> rowLogList = logs.getRowLogList();
         if (CollectionUtils.isEmpty(resultList) && CollectionUtils.isEmpty(rowLogList)) {
             ExcelCommonLog commonLog = new ExcelCommonLog();
             logs.setExcelCommonLog(commonLog);
@@ -284,9 +119,8 @@ public class Ihr360ExcelImportUtil {
             commonLog.setExcelLogItems(excelLogItems);
             return resultList;
         }
-
-
         logs.setRowLogList(rowLogList);
+
         return resultList;
     }
 
@@ -421,49 +255,5 @@ public class Ihr360ExcelImportUtil {
         return null;
     }
 
-
-    private static Map<String, Integer> getHeaderIndexTitleMap(Map<String, Integer> headerTitleIndexMap,
-                                                               final List<Integer> convertedHeaderRows, Row headerRow, Row row) {
-
-        headerRow = row;
-
-        Ihr360ImportExcelContext excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
-        ImportParams<T> importParams = excelContext.getImportParams();
-        CommonSpecification commonSpecification = importParams.getCommonSpecification();
-
-        for (Integer headerRowNum : commonSpecification.getTemplateHeaderRowNums()) {
-            if (convertedHeaderRows.contains(headerRowNum)) {
-                continue;
-            }
-            headerRow = row;
-            convertedHeaderRows.add(row.getRowNum());
-
-            if (MapUtils.isEmpty(headerTitleIndexMap)) {
-                headerTitleIndexMap = Ihr360ExcelRowUtil.convertRowToHeaderMap(headerRow);
-            } else {
-                Map<Integer, String> existIndexHeaderMap = new LinkedHashMap<>();
-                headerTitleIndexMap.forEach((header, index) -> {
-                    existIndexHeaderMap.put(index, header);
-                });
-
-                Map<String, Integer> newHeaderIndexMap = Ihr360ExcelRowUtil.convertRowToHeaderMap(headerRow);
-
-                if (MapUtils.isNotEmpty(newHeaderIndexMap)) {
-                    newHeaderIndexMap.forEach((header, index) -> {
-                        existIndexHeaderMap.put(index, header);
-
-                    });
-                    Map<String, Integer> tmpHeaderIndexMap = new LinkedHashMap<>();
-                    existIndexHeaderMap.forEach((index, header) -> {
-                        tmpHeaderIndexMap.put(header, index);
-                    });
-                    headerTitleIndexMap = tmpHeaderIndexMap;
-                }
-            }
-            break;
-        }
-
-        return headerTitleIndexMap;
-    }
 
 }

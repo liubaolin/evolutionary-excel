@@ -31,9 +31,9 @@ import java.util.Map;
 public class Ihr360ExcelRowUtil {
 
     public static boolean checkBlankRow(Row row) {
-        boolean allRowIsNull = true;
+        boolean allRowCellsIsNull = true;
         if (row == null) {
-            return allRowIsNull;
+            return allRowCellsIsNull;
         }
         Iterator<Cell> cellIterator = row.cellIterator();
         while (cellIterator.hasNext()) {
@@ -44,14 +44,18 @@ public class Ihr360ExcelRowUtil {
                 throw new ExcelException("验证空行时，发生数据转换异常！");
             }
             if (cellValue != null && StringUtils.isNotBlank(String.valueOf(cellValue))) {
-                allRowIsNull = false;
+                allRowCellsIsNull = false;
                 break;
             }
         }
-        return allRowIsNull;
+        return allRowCellsIsNull;
     }
 
-    public static Map<String, Object> handleExcelRowToMap(Map<String, Integer> fileHeaderIndexMap, Row row, List<ExcelLogItem> rowLogs, List<ColumnSpecification> columnSpecifications) {
+    public static Map<String, Object> handleExcelRowToMap(Map<String, Integer> fileHeaderIndexMap,
+                                                          Row row, List<ExcelLogItem> rowLogs) {
+
+        Ihr360ImportExcelContext excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
+        List<ColumnSpecification> columnSpecifications = excelContext.getImportParams().getColumnSpecifications();
         Map<String, Object> map = new LinkedHashMap<>();
         // 判空
         for (Map.Entry<String, Integer> entry : fileHeaderIndexMap.entrySet()) {
@@ -160,7 +164,7 @@ public class Ihr360ExcelRowUtil {
         ImportParams importParams = excelContext.getImportParams();
 
         CommonSpecification commonSpecification = importParams.getCommonSpecification();
-        if (commonSpecification == null || MapUtils.isEmpty(commonSpecification.getTemplateHeaders())) {
+        if (commonSpecification == null || MapUtils.isEmpty(commonSpecification.getTemplateHeaderIndexTitleMap())) {
             return false;
         }
         if (commonSpecification.getTemplateDataBeginRowNum() == null) {

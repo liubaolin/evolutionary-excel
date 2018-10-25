@@ -49,6 +49,8 @@ public class Ihr360ImportExcelContext<T> implements Serializable {
 
     private String sheetCursor = "0";
 
+    private  Map<String, Integer> headerTitleIndexMap;
+
     public int getHeaderRowNum() {
         return headerRowNum;
     }
@@ -130,5 +132,37 @@ public class Ihr360ImportExcelContext<T> implements Serializable {
         }
 
         return currentWorkbook;
+    }
+
+    public Workbook getCurrentWorkbook() {
+        return currentWorkbook;
+    }
+
+    public void setCurrentWorkbook(Workbook currentWorkbook) {
+        this.currentWorkbook = currentWorkbook;
+    }
+
+    public Map<String, Sheet> getSheets() {
+        return sheets;
+    }
+
+    public void setSheets(Map<String, Sheet> sheets) {
+        this.sheets = sheets;
+    }
+
+    public String getSheetCursor() {
+        return sheetCursor;
+    }
+
+    public void setSheetCursor(String sheetCursor) {
+        this.sheetCursor = sheetCursor;
+    }
+
+    public Map<String, Integer> getHeaderTitleIndexMap() {
+        return headerTitleIndexMap;
+    }
+
+    public void setHeaderTitleIndexMap(Map<String, Integer> headerTitleIndexMap) {
+        this.headerTitleIndexMap = headerTitleIndexMap;
     }
 }

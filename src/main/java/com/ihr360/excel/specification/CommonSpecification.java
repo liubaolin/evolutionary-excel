@@ -54,7 +54,7 @@ public class CommonSpecification implements Serializable {
     /**
      * 模板表头
      */
-    protected Map<String, Integer> templateHeaders;
+    protected Map<String, Integer> templateHeaderIndexTitleMap;
     /**
      * 模板表头所在列
      */
@@ -139,13 +139,13 @@ public class CommonSpecification implements Serializable {
         this.enableMatchStaff = enableMatchStaff;
     }
 
-    public Map<String, Integer> getTemplateHeaders() {
-        return templateHeaders;
+    public Map<String, Integer> getTemplateHeaderIndexTitleMap() {
+        return templateHeaderIndexTitleMap;
     }
 
     @Deprecated
-    public void setTemplateHeaders(Map<String, Integer> templateHeaders) {
-        this.templateHeaders = templateHeaders;
+    public void setTemplateHeaderIndexTitleMap(Map<String, Integer> templateHeaderIndexTitleMap) {
+        this.templateHeaderIndexTitleMap = templateHeaderIndexTitleMap;
     }
 
     public List<Integer> getTemplateHeaderRowNums() {
@@ -258,7 +258,7 @@ public class CommonSpecification implements Serializable {
             commonSpecification.setEnableMatchStaff(enableMatchStaff);
             commonSpecification.setStaffNameAlias(staffNameAlias);
             commonSpecification.setMobileNoAlias(mobileNoAlias);
-            commonSpecification.setTemplateHeaders(templateHeaders);
+            commonSpecification.setTemplateHeaderIndexTitleMap(templateHeaders);
             commonSpecification.setTemplateHeaderRowNums(templateHeaderRowNums);
             commonSpecification.setTemplateDataBeginRowNum(templateDataBeginRowNum);
             commonSpecification.setCheckRepeatHeader(checkRepeatHeader);
