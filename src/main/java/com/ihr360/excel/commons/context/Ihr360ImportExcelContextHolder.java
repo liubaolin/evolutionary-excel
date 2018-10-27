@@ -43,7 +43,7 @@ public class Ihr360ImportExcelContextHolder {
 
 
     public static <T> void initImportContext(ImportParams<T> importParams, InputStream inputStream) {
-
+        clean();
         if (importParams == null) {
             throw new ExcelException("导入参数(importParams)不能为空,请检查");
         }

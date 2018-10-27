@@ -72,7 +72,7 @@ public class  TestExportMultipleSheepExcel {
         List<List<Object>> sheet2Datas = new ArrayList<>();
 
         List<Object> sheet2Data1 = new ArrayList<>();
-        sheet2Data1.add("Foo");
+        sheet2Data1.add("Foo2");
         sheet2Data1.add("2017");
         sheet2Data1.add("12");
         sheet2Data1.add(null);

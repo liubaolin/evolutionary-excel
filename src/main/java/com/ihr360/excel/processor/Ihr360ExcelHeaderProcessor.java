@@ -129,8 +129,6 @@ public class Ihr360ExcelHeaderProcessor<T> extends AbstractIhr360ImportExcelProc
         Map<String, Integer> templateHeaderIndexTitleMap = commonSpecification.getTemplateHeaderIndexTitleMap();
         Map<String, Integer> headerTitleIndexMap = Maps.newHashMap();
 
-        headerRow = row;
-
         for (Integer headerRowNum : commonSpecification.getTemplateHeaderRowNums()) {
             if (convertedHeaderRows.contains(headerRowNum)) {
                 continue;
@@ -165,7 +163,5 @@ public class Ihr360ExcelHeaderProcessor<T> extends AbstractIhr360ImportExcelProc
 
         return headerTitleIndexMap;
     }
-
-
 
 }

@@ -167,6 +167,7 @@ public class Ihr360TemplateExcelConfiguration extends AbstractExcelConfigurerAda
                     .enableMatchStaff(enableMatchStaff)
                     .staffNameAlias(staffNameAlias)
                     .mobileNoAlias(mobileNoAlias)
+                    .checkRepeatHeader(checkRepeatHeader)
                     .build();
 
             Ihr360TemplateExcelConfiguration ihr360TemplateExcelConfiguration = new Ihr360TemplateExcelConfiguration();

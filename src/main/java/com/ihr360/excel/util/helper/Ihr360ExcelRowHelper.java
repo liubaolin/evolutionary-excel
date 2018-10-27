@@ -110,16 +110,16 @@ public class Ihr360ExcelRowHelper {
     /**
      * row转Map<列名，列index>
      *
-     * @param row
+     * @param headerRow
      * @return
      */
-    public static Map<String, Integer> convertRowToHeaderTitleIndexMap(Row row) {
+    public static Map<String, Integer> convertRowToHeaderTitleIndexMap(Row headerRow) {
         Ihr360ImportExcelContext excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
         CommonSpecification commonSpecification = excelContext.getImportParams().getCommonSpecification();
         boolean checkRepeatHeader = commonSpecification == null ? true : commonSpecification.isCheckRepeatHeader();
 
         Map<String, Integer> headerTitleIndexMap = new LinkedHashMap<>();
-        Iterator<Cell> cellIterator = row.cellIterator();
+        Iterator<Cell> cellIterator = headerRow.cellIterator();
         while (cellIterator.hasNext()) {
             Cell cell = cellIterator.next();
             String headerTitle;

@@ -64,7 +64,7 @@ public class Ihr360ExportExcelContextHolder {
 
 
     public static <T> void initExportContext(boolean exportHssf, ExportParams<T> exportParams, OutputStream out) {
-
+        clean();
         if (exportParams == null) {
             throw new ExcelException("导出参数(exportParams)不能为空,请检查");
         }

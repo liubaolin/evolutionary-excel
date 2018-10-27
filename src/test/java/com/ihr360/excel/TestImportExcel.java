@@ -4,6 +4,7 @@
 package com.ihr360.excel;
 
 import com.google.common.collect.Lists;
+import com.ihr360.excel.commons.context.Ihr360ImportExcelContextHolder;
 import com.ihr360.excel.config.Ihr360DefaultExcelConfiguration;
 import com.ihr360.excel.config.ExcelDefaultConfig;
 import com.ihr360.excel.commons.context.Ihr360ImportExcelContext;
@@ -47,7 +48,6 @@ public class TestImportExcel {
     public void importBeanXls() throws FileNotFoundException {
         File f = new File("testImportExcel.xls");
         InputStream inputStream = new FileInputStream(f);
-        Ihr360ImportExcelContext ihr360ImportExcelContext = new Ihr360ImportExcelContext();
 
         ColumnSpecification nullBaleDateColumnSpe = ColumnSpecification.builder()
                 .cellType(Date.class)
@@ -63,7 +63,8 @@ public class TestImportExcel {
 
         Collection<Payroll4ExcelVo> excelDatas = Ihr360ExcelImportUtil.importExcel(ihr360DefaultExcelConfiguration, inputStream);
 
-        ExcelLogs logs = ihr360ImportExcelContext.getLogs();
+        Ihr360ImportExcelContext<Object> excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
+        ExcelLogs logs = excelContext.getLogs();
 
         //没有Excel基本错误日志
         assertTrue(!logs.hasExcelLogs());
@@ -156,8 +157,6 @@ public class TestImportExcel {
     public void importMapXls() throws FileNotFoundException {
         File f = new File("testImportExcel.xls");
         InputStream inputStream = new FileInputStream(f);
-        Ihr360ImportExcelContext ihr360ImportExcelContext = new Ihr360ImportExcelContext();
-
 
         Ihr360DefaultExcelConfiguration ihr360DefaultExcelConfiguration = Ihr360DefaultExcelConfiguration
                 .builder()
@@ -165,11 +164,13 @@ public class TestImportExcel {
                 .build();
 
         Collection excelDatas = Ihr360ExcelImportUtil.importExcel(ihr360DefaultExcelConfiguration, inputStream);
+
+        Ihr360ImportExcelContext ihr360ImportExcelContext = Ihr360ImportExcelContextHolder.getExcelContext();
         List<ExcelRowLog> excelRowLogs = ihr360ImportExcelContext.getLogs().getRowLogList();
         Map<Integer, ExcelRowLog> numLogMap = excelRowLogs.stream().collect(Collectors.toMap(ExcelRowLog::getRowNum, Function.identity()));
 
         for (int i = 2; i <= 14; i++) {
-            assertNull(numLogMap.get(2));
+            assertNull(numLogMap.get(i));
         }
 
         assertNotNull(numLogMap.get(15));
@@ -292,14 +293,15 @@ public class TestImportExcel {
         File f = new File("testImportExcel.xls");
         InputStream inputStream = new FileInputStream(f);
 
-        ExcelLogs logs = new ExcelLogs();
         ImportParams<Map> importParams = new ImportParams<>();
         importParams.setImportType(Map.class);
 
 
         Collection<Map> importExcel = Ihr360ExcelImportUtil.importExcel(importParams, inputStream);
 
-        List<ExcelRowLog> excelRowLogs = logs.getRowLogList();
+        Ihr360ImportExcelContext excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
+        ;
+        List<ExcelRowLog> excelRowLogs = excelContext.getLogs().getRowLogList();
 
         Map<Integer, ExcelRowLog> numLogMap = excelRowLogs.stream().collect(Collectors.toMap(ExcelRowLog::getRowNum, Function.identity()));
 

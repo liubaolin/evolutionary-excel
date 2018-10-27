@@ -22,6 +22,7 @@ public class Ihr360ExcelLogHelper {
         ExcelLogs logs = excelContext.getLogs();
         List<ExcelRowLog> rowLogList = logs.getRowLogList();
         rowLogList.add(new ExcelRowLog(rowLogItems, rowNum + 1));
+
     }
 
 }
