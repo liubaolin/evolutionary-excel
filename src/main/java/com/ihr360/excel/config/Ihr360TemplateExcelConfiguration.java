@@ -1,9 +1,8 @@
 package com.ihr360.excel.config;
 
-import com.ihr360.excel.constants.ExcelDefaultConfig;
-import com.ihr360.excel.metaData.ImportParams;
-import com.ihr360.excel.specification.ColumnSpecification;
-import com.ihr360.excel.specification.CommonSpecification;
+import com.ihr360.excel.core.metaData.ImportParams;
+import com.ihr360.excel.commons.specification.ColumnSpecification;
+import com.ihr360.excel.commons.specification.CommonSpecification;
 
 import java.util.List;
 import java.util.Map;

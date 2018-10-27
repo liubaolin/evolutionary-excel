@@ -3,23 +3,24 @@ package com.ihr360.excel.util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.ihr360.excel.annotation.ExcelCell;
+import com.ihr360.excel.core.annotation.ExcelCell;
 import com.ihr360.excel.config.ExcelConfigurer;
 import com.ihr360.excel.config.Ihr360TemplateExcelConfiguration;
-import com.ihr360.excel.context.Ihr360ImportExcelContext;
-import com.ihr360.excel.context.Ihr360ImportExcelContextHolder;
-import com.ihr360.excel.exception.ExcelException;
-import com.ihr360.excel.handler.Ihr360ExcelHandlerManager;
-import com.ihr360.excel.handler.Ihr360ExcelRowUtil;
-import com.ihr360.excel.handler.Ihr360ImportExcelProcessor;
-import com.ihr360.excel.logs.ExcelCommonLog;
-import com.ihr360.excel.logs.ExcelLogItem;
-import com.ihr360.excel.logs.ExcelLogType;
-import com.ihr360.excel.logs.ExcelLogs;
-import com.ihr360.excel.logs.ExcelRowLog;
-import com.ihr360.excel.metaData.CellComment;
-import com.ihr360.excel.metaData.ImportParams;
-import com.ihr360.excel.specification.CommonSpecification;
+import com.ihr360.excel.commons.context.Ihr360ImportExcelContext;
+import com.ihr360.excel.commons.context.Ihr360ImportExcelContextHolder;
+import com.ihr360.excel.commons.exception.ExcelException;
+import com.ihr360.excel.util.helper.Ihr360ExcelRowHelper;
+import com.ihr360.excel.processor.Ihr360ExcelHandlerManager;
+import com.ihr360.excel.processor.Ihr360ExcelHeaderProcessor;
+import com.ihr360.excel.processor.Ihr360ImportExcelProcessor;
+import com.ihr360.excel.commons.logs.ExcelCommonLog;
+import com.ihr360.excel.commons.logs.ExcelLogItem;
+import com.ihr360.excel.commons.logs.ExcelLogType;
+import com.ihr360.excel.commons.logs.ExcelLogs;
+import com.ihr360.excel.commons.logs.ExcelRowLog;
+import com.ihr360.excel.core.metaData.CellComment;
+import com.ihr360.excel.core.metaData.ImportParams;
+import com.ihr360.excel.commons.specification.CommonSpecification;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
@@ -106,7 +107,7 @@ public class Ihr360ExcelImportUtil {
                 return resultList;
             }
         }
-        
+
         Ihr360ImportExcelContext<T> ihr360ImportExcelContext = Ihr360ImportExcelContextHolder.getExcelContext();
         ExcelLogs logs = ihr360ImportExcelContext.getLogs();
         List<ExcelRowLog> rowLogList = logs.getRowLogList();
@@ -126,48 +127,33 @@ public class Ihr360ExcelImportUtil {
 
 
     /**
-     * 获取Excel第一行数据
-     * 不忽略空行与隐藏行
+     * 获取指定行数据
      *
      * @return
      */
-    public static Map<String, Integer> importGetFirstLineHeaderToMap() {
-        Ihr360ImportExcelContext excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
-        Sheet sheet = excelContext.getCurrentSheet();
-        if (sheet == null) {
-            return Maps.newLinkedHashMap();
-        }
-        Iterator<Row> rowIterator = sheet.rowIterator();
-        // 从excel读取的表头 Map<title,index>
-        Map<String, Integer> fileHeaderIndexMap = Maps.newLinkedHashMap();
-
-        if (rowIterator.hasNext()) {
-            Row row = rowIterator.next();
-            if (row.getRowNum() == 0) {
-                fileHeaderIndexMap = Ihr360ExcelRowUtil.convertRowToHeaderMap(row);
-            }
-        }
-        return fileHeaderIndexMap;
+    public static Map<String, Integer> getHeaderTitleIndexMap() {
+        Ihr360ExcelHeaderProcessor ihr360ExcelHeaderProcessor = new Ihr360ExcelHeaderProcessor();
+        ihr360ExcelHeaderProcessor.doProcess();
+        return Ihr360ImportExcelContextHolder.getExcelContext().getHeaderTitleIndexMap();
     }
 
     /**
-     * 导入获取真实数据所有条数
+     * 非空且非隐藏的行数
      *
      * @return
      */
-    public static Integer importGetDataNum() {
+    public static int countNorBlankOrHiddenRows() {
         Ihr360ImportExcelContext excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
         Sheet sheet = excelContext.getCurrentSheet();
-        Integer dataNum = 0;
-
+        int rowNum = 0;
         Iterator<Row> rowIterator = sheet.rowIterator();
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            if (!Ihr360ExcelRowUtil.checkBlankRow(row) && !row.getZeroHeight()) {
-                dataNum++;
+            if (!Ihr360ExcelRowHelper.checkBlankRow(row) && !row.getZeroHeight()) {
+                rowNum++;
             }
         }
-        return dataNum;
+        return rowNum;
     }
 
     /**

@@ -1,11 +1,11 @@
 package com.ihr360.excel;
 
-import com.ihr360.excel.cellstyle.ExcelCellStyle;
-import com.ihr360.excel.cellstyle.ExcelCellStyleFactory;
-import com.ihr360.excel.metaData.CellComment;
-import com.ihr360.excel.metaData.ExportParams;
-import com.ihr360.excel.util.ExcelDateFormatUtil;
-import com.ihr360.excel.util.Ihr360ExcelImportUtil;
+import com.ihr360.excel.core.cellstyle.ExcelCellStyle;
+import com.ihr360.excel.core.cellstyle.ExcelCellStyleFactory;
+import com.ihr360.excel.core.metaData.CellComment;
+import com.ihr360.excel.core.metaData.ExportParams;
+import com.ihr360.excel.util.Ihr360ExcelExportUtil;
+import com.ihr360.excel.util.date.Ihr360ExcelDateFormatUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Test;
 
@@ -63,7 +63,7 @@ public class TestExportBean {
 
         //日期列输出格式
         Map<String, String> datePattern = new HashMap<>();
-        datePattern.put(Payroll4ExcelVo.EXCEL_TEST_PAYTIME, ExcelDateFormatUtil.PATTERN_ISO_ON_DATE);
+        datePattern.put(Payroll4ExcelVo.EXCEL_TEST_PAYTIME, Ihr360ExcelDateFormatUtil.PATTERN_ISO_ON_DATE);
 
         Map<String, CellComment> headerCommentMap = new HashMap<>();
         CellComment cellComment = CellComment.createCellComment(new int[]{255, 125, 1023, 150, 0, 0, 2, 2}, null, "这是姓名的备注", false);
@@ -78,7 +78,8 @@ public class TestExportBean {
         exportParams.setDatePatternMap(datePattern);
         exportParams.setHeaderCommentMap(headerCommentMap);
 
-        Ihr360ExcelImportUtil.exportExcel(exportParams, out);
+        Ihr360ExcelExportUtil.exportExcel(exportParams, out);
+
         out.close();
     }
 }

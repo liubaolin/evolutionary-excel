@@ -3,11 +3,11 @@
  */
 package com.ihr360.excel;
 
-import com.ihr360.excel.metaData.ExportHeaderParams;
-import com.ihr360.excel.metaData.ExportParams;
-import com.ihr360.excel.specification.MergedRegionSpecification;
-import com.ihr360.excel.util.ExcelDateFormatUtil;
-import com.ihr360.excel.util.Ihr360ExcelImportUtil;
+import com.ihr360.excel.commons.specification.MergedRegionSpecification;
+import com.ihr360.excel.core.metaData.ExportHeaderParams;
+import com.ihr360.excel.core.metaData.ExportParams;
+import com.ihr360.excel.util.Ihr360ExcelExportUtil;
+import com.ihr360.excel.util.date.Ihr360ExcelDateFormatUtil;
 import org.junit.Test;
 
 import java.io.File;
@@ -83,7 +83,7 @@ public class TestExportMap {
 
         //日期列输出格式
         Map<String, String> datePattern = new HashMap<>();
-        datePattern.put("excel_test_payTime", ExcelDateFormatUtil.PATTERN_ISO_ON_DATE);
+        datePattern.put("excel_test_payTime", Ihr360ExcelDateFormatUtil.PATTERN_ISO_ON_DATE);
 
 
         Map<String, Class> dateTypeParam = new HashMap<>();
@@ -105,7 +105,7 @@ public class TestExportMap {
 
         exportParams.setDataTypeMap(dateTypeParam);
 
-        Ihr360ExcelImportUtil.exportExcel(exportParams, out);
+        Ihr360ExcelExportUtil.exportExcel(exportParams, out);
         out.close();
     }
 
@@ -169,7 +169,7 @@ public class TestExportMap {
         exportParams.setRowDatas(datas);
         exportParams.setHeaderMap(headerMap);
         exportParams.setMergedRegionSpecifications(mergedRegionSpecifications);
-        Ihr360ExcelImportUtil.exportExcel(exportParams, out);
+        Ihr360ExcelExportUtil.exportExcel(exportParams, out);
         out.close();
 
     }
@@ -219,7 +219,7 @@ public class TestExportMap {
         exportParams.setRowDatas(datas);
         exportParams.setHeaderMap(headerMap);
         exportParams.setMergedRegionSpecifications(mergedRegionSpecifications);
-        Ihr360ExcelImportUtil.exportExcel(exportParams, out);
+        Ihr360ExcelExportUtil.exportExcel(exportParams, out);
         out.close();
 
     }

@@ -6,19 +6,8 @@
     <groupId>evolutionary</groupId>
     <artifactId>evolutionary-excel</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <packaging>pom</packaging>
+
+    <packaging>jar</packaging>
 
     <licenses>
         <license>
@@ -40,7 +29,7 @@
         <org.apache.poi.version>3.11</org.apache.poi.version>
         <commons-lang3.version>3.6</commons-lang3.version>
         <commons-collections.version>3.2.2</commons-collections.version>
-        <spring.version>4.2.1.RELEASE</spring.version>
+        <spring-framework.version>5.1.1.RELEASE</spring-framework.version>
         <ihr360-common.version>1.2.0-SNAPSHOT</ihr360-common.version>
         <servlet-api.servison>2.5</servlet-api.servison>
         <lombok.servion>1.18.2</lombok.servion>
@@ -53,6 +42,13 @@
             <artifactId>guava</artifactId>
             <version>23.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring-framework.version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -125,4 +121,17 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

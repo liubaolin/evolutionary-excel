@@ -3,8 +3,8 @@ package com.ihr360.excel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ihr360.excel.config.Ihr360TemplateExcelConfiguration;
-import com.ihr360.excel.context.Ihr360ImportExcelContext;
-import com.ihr360.excel.logs.ExcelRowLog;
+import com.ihr360.excel.commons.context.Ihr360ImportExcelContext;
+import com.ihr360.excel.commons.logs.ExcelRowLog;
 import com.ihr360.excel.util.Ihr360ExcelImportUtil;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class TestMergeHeaderImport {
                 .build();
 
 
-        Collection<Map> excelDatas = Ihr360ExcelImportUtil.importExcel(templateExcelConfiguration, inputStream, ihr360ImportExcelContext);
+        Collection<Map> excelDatas = Ihr360ExcelImportUtil.importExcel(templateExcelConfiguration, inputStream);
 
         List<ExcelRowLog> excelRowLogs = ihr360ImportExcelContext.getLogs().getRowLogList();
 

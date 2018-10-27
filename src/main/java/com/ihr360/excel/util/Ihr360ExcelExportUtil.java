@@ -1,10 +1,10 @@
 package com.ihr360.excel.util;
 
-import com.ihr360.excel.cellstyle.ExcelCellStyle;
-import com.ihr360.excel.context.Ihr360ExportExcelContext;
-import com.ihr360.excel.context.Ihr360ExportExcelContextHolder;
-import com.ihr360.excel.metaData.ExcelSheet;
-import com.ihr360.excel.metaData.ExportParams;
+import com.ihr360.excel.core.cellstyle.ExcelCellStyle;
+import com.ihr360.excel.commons.context.Ihr360ExportExcelContext;
+import com.ihr360.excel.commons.context.Ihr360ExportExcelContextHolder;
+import com.ihr360.excel.core.metaData.ExcelSheet;
+import com.ihr360.excel.core.metaData.ExportParams;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -20,7 +20,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import static com.ihr360.excel.handler.Ihr360ExcelSheetHandler.write2Sheet;
+import static com.ihr360.excel.util.helper.Ihr360ExcelSheetHelper.write2Sheet;
 
 public class Ihr360ExcelExportUtil {
 
@@ -44,7 +44,6 @@ public class Ihr360ExcelExportUtil {
      * @param out 与输出设备关联的流对象，可以将EXCEL文档导出到本地文件或者网络中
      */
     public static <T> void exportExcel(ExportParams<T> exportParams, OutputStream out) {
-
         Ihr360ExportExcelContextHolder.initExportContext(true, exportParams, out);
         exportExcel();
     }

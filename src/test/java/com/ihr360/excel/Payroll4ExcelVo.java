@@ -1,11 +1,11 @@
 package com.ihr360.excel;
 
 
-import com.ihr360.excel.annotation.ExcelCell;
-import com.ihr360.excel.annotation.ExcelConfig;
-import com.ihr360.excel.annotation.RowNumberField;
-import com.ihr360.excel.metaData.AbstractFlexbleFieldExcel;
-import com.ihr360.excel.metaData.ExcelI18nStrategyType;
+import com.ihr360.excel.core.annotation.ExcelCell;
+import com.ihr360.excel.core.annotation.ExcelConfig;
+import com.ihr360.excel.core.annotation.RowNumberField;
+import com.ihr360.excel.core.metaData.AbstractFlexbleFieldExcel;
+import com.ihr360.excel.core.metaData.ExcelI18nStrategyType;
 
 import java.util.Date;
 

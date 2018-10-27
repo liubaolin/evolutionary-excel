@@ -1,9 +1,9 @@
 package com.ihr360.excel;
 
 import com.google.common.collect.Lists;
-import com.ihr360.excel.metaData.ExcelSheet;
-import com.ihr360.excel.metaData.ExportParams;
-import com.ihr360.excel.util.Ihr360ExcelImportUtil;
+import com.ihr360.excel.core.metaData.ExcelSheet;
+import com.ihr360.excel.core.metaData.ExportParams;
+import com.ihr360.excel.util.Ihr360ExcelExportUtil;
 import org.junit.Test;
 
 import java.io.File;
@@ -104,7 +104,7 @@ public class  TestExportMultipleSheepExcel {
 
         exportParams.setSheets(sheets);
 
-        Ihr360ExcelImportUtil.exportMultipleSheetExcel(exportParams, out);
+        Ihr360ExcelExportUtil.exportExcel(exportParams, out);
         out.close();
     }
 

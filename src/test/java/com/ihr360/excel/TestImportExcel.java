@@ -4,15 +4,15 @@
 package com.ihr360.excel;
 
 import com.google.common.collect.Lists;
-import com.ihr360.excel.config.Ihr360DefaultAbstractExcelConfiguration;
-import com.ihr360.excel.constants.ExcelDefaultConfig;
-import com.ihr360.excel.context.Ihr360ImportExcelContext;
-import com.ihr360.excel.logs.ExcelLogType;
-import com.ihr360.excel.logs.ExcelLogs;
-import com.ihr360.excel.logs.ExcelRowLog;
-import com.ihr360.excel.metaData.ImportParams;
-import com.ihr360.excel.specification.ColumnSpecification;
-import com.ihr360.excel.specification.CommonSpecification;
+import com.ihr360.excel.config.Ihr360DefaultExcelConfiguration;
+import com.ihr360.excel.config.ExcelDefaultConfig;
+import com.ihr360.excel.commons.context.Ihr360ImportExcelContext;
+import com.ihr360.excel.commons.logs.ExcelLogType;
+import com.ihr360.excel.commons.logs.ExcelLogs;
+import com.ihr360.excel.commons.logs.ExcelRowLog;
+import com.ihr360.excel.core.metaData.ImportParams;
+import com.ihr360.excel.commons.specification.ColumnSpecification;
+import com.ihr360.excel.commons.specification.CommonSpecification;
 import com.ihr360.excel.util.Ihr360ExcelImportUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class TestImportExcel {
                 .columns(Lists.newArrayList("弹性列5"))
                 .build();
 
-        Ihr360DefaultAbstractExcelConfiguration ihr360DefaultExcelConfiguration = Ihr360DefaultAbstractExcelConfiguration.builder()
+        Ihr360DefaultExcelConfiguration ihr360DefaultExcelConfiguration = Ihr360DefaultExcelConfiguration.builder()
                 .importType(Payroll4ExcelVo.class)
                 .columnSpecification(Lists.newArrayList(nullBaleDateColumnSpe))
                 .build();
@@ -159,7 +159,7 @@ public class TestImportExcel {
         Ihr360ImportExcelContext ihr360ImportExcelContext = new Ihr360ImportExcelContext();
 
 
-        Ihr360DefaultAbstractExcelConfiguration ihr360DefaultExcelConfiguration = Ihr360DefaultAbstractExcelConfiguration
+        Ihr360DefaultExcelConfiguration ihr360DefaultExcelConfiguration = Ihr360DefaultExcelConfiguration
                 .builder()
                 .importType(Map.class)
                 .build();
@@ -227,7 +227,7 @@ public class TestImportExcel {
         headerJudgeList.add(mobileAilias);
         commonSpecification.setHeaderColumnJudge(headerJudgeList);
 
-        List<Map> excelDatas = (List<Map>) Ihr360ExcelImportUtil.importExcel(importParams, inputStream, logs);
+        List<Map> excelDatas = (List<Map>) Ihr360ExcelImportUtil.importExcel(importParams, inputStream);
 
         assertNotNull(excelDatas.get(0).get(ExcelDefaultConfig.COMMON_SPECIFICATION_ROWNUM));
         assertEquals(excelDatas.get(0).get("支付时间"), "2018.01.29");
@@ -255,7 +255,7 @@ public class TestImportExcel {
         ImportParams<Map> importParams = new ImportParams<>();
         importParams.setImportType(Map.class);
 
-        Map<String, Integer> headerMap = Ihr360ExcelImportUtil.importGetFirstLineHeaderToMap(inputStream, logs);
+        Map<String, Integer> headerMap = Ihr360ExcelImportUtil.getHeaderTitleIndexMap();
 
         headerMap.forEach((k, v) -> {
             System.out.println("key=" + k + "" + "value=" + v);
@@ -280,7 +280,7 @@ public class TestImportExcel {
         ImportParams<Map> importParams = new ImportParams<>();
         importParams.setImportType(Map.class);
 
-        Integer num = Ihr360ExcelImportUtil.importGetDataNum(inputStream, logs);
+        Integer num = Ihr360ExcelImportUtil.countNorBlankOrHiddenRows();
 
         System.out.println(num);
 
@@ -297,7 +297,7 @@ public class TestImportExcel {
         importParams.setImportType(Map.class);
 
 
-        Collection<Map> importExcel = Ihr360ExcelImportUtil.importExcel(importParams, inputStream, logs);
+        Collection<Map> importExcel = Ihr360ExcelImportUtil.importExcel(importParams, inputStream);
 
         List<ExcelRowLog> excelRowLogs = logs.getRowLogList();
 
