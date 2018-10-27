@@ -11,7 +11,9 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
@@ -22,6 +24,7 @@ import java.util.Set;
 
 /**
  * 下拉选处理类
+ *
  * @author richey
  */
 public class Ihr360ExcelDropListHelper {
@@ -62,8 +65,8 @@ public class Ihr360ExcelDropListHelper {
         // 单元格样式
         CellStyle style = workbook.createCellStyle();
         style.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-        style.setAlignment(CellStyle.ALIGN_CENTER);
-        style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         // 循环指定单元格下拉数据
         for (int i = startRow; i <= endRow; i++) {
             row = (HSSFRow) realSheet.createRow(i);
@@ -108,7 +111,6 @@ public class Ihr360ExcelDropListHelper {
         }
         return workbook;
     }
-
 
 
 }

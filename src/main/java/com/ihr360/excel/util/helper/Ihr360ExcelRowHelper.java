@@ -1,6 +1,5 @@
 package com.ihr360.excel.util.helper;
 
-import com.ihr360.excel.core.annotation.ExcelConfig;
 import com.ihr360.excel.commons.context.Ihr360ImportExcelContext;
 import com.ihr360.excel.commons.context.Ihr360ImportExcelContextHolder;
 import com.ihr360.excel.commons.exception.ExcelCanHandleException;
@@ -8,9 +7,10 @@ import com.ihr360.excel.commons.exception.ExcelException;
 import com.ihr360.excel.commons.exception.ExcellExceptionType;
 import com.ihr360.excel.commons.logs.ExcelLogItem;
 import com.ihr360.excel.commons.logs.ExcelLogType;
-import com.ihr360.excel.core.metaData.ImportParams;
 import com.ihr360.excel.commons.specification.ColumnSpecification;
 import com.ihr360.excel.commons.specification.CommonSpecification;
+import com.ihr360.excel.core.annotation.ExcelConfig;
+import com.ihr360.excel.core.metaData.ImportParams;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -125,7 +125,7 @@ public class Ihr360ExcelRowHelper {
             String headerTitle;
 
             switch (cell.getCellType()) {
-                case Cell.CELL_TYPE_NUMERIC:
+                case NUMERIC:
                     // 判断是日期类型
                     if (DateUtil.isCellDateFormatted(cell)) {
                         throw new ExcelCanHandleException(ExcellExceptionType.HEADER_DATE_FIELD_NOTSUPPORT);
@@ -133,10 +133,10 @@ public class Ihr360ExcelRowHelper {
                         headerTitle = NumberToTextConverter.toText(cell.getNumericCellValue());
                     }
                     break;
-                case Cell.CELL_TYPE_STRING:
+                case STRING:
                     headerTitle = cell.getStringCellValue();
                     break;
-                case Cell.CELL_TYPE_BLANK:
+                case BLANK:
                     continue;
                 default:
                     throw new ExcelCanHandleException(ExcellExceptionType.HEADER_DATA_TYPE_NOTSUPPORT);

@@ -1,11 +1,17 @@
 package com.ihr360.excel.core.cellstyle;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Workbook;
 
+/**
+ * @author richey
+ */
 public final class ExcelCellStyleFactory {
 
     public static Ihr360CellStyle createDefaultHeaderCellStyle() {
@@ -45,7 +51,7 @@ public final class ExcelCellStyleFactory {
         return excelFont;
     }
 
-    /*private static Ihr360SSCellStyle createDefaultExcelCellStyle() {
+    private static Ihr360SSCellStyle createDefaultExcelCellStyle() {
         Ihr360SSCellStyle excelCellStyle = Ihr360SSCellStyle.createExcelCellStyle();
         //单元格内容水平居中
         excelCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -58,13 +64,13 @@ public final class ExcelCellStyleFactory {
         excelCellStyle.setBorderTop(BorderStyle.THIN);
         excelCellStyle.setBorderRight(BorderStyle.THIN);
         return excelCellStyle;
-    }*/
+    }
 
     private static Ihr360CellStyle createdExcelCellStyle() {
         Ihr360CellStyle excelCellStyle = Ihr360CellStyle.createExcelCellStyle();
         //单元格内容水平居中
-        excelCellStyle.setHorizontalAlignment(CellStyle.ALIGN_CENTER);
-        excelCellStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        excelCellStyle.setHorizontalAlignment(Ihr360CellStyle.ALIGN_CENTER);
+        excelCellStyle.setVerticalAlignment(Ihr360CellStyle.VERTICAL_CENTER);
         //
         excelCellStyle.setForegroundColor(IndexedColors.AQUA.getIndex());
         excelCellStyle.setFillPattern(Ihr360CellStyle.SOLID_FOREGROUND);

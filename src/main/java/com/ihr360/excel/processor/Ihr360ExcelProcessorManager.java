@@ -10,11 +10,11 @@ import java.util.List;
 /**
  * @author richey
  */
-public class Ihr360ExcelHandlerManager<T> {
+public class Ihr360ExcelProcessorManager<T> {
 
     private List<Ihr360ImportExcelProcessor<T>> processors;
 
-    public Ihr360ExcelHandlerManager() {
+    public Ihr360ExcelProcessorManager() {
         processors = Lists.newArrayListWithCapacity(2);
         processors.add(new Ihr360ExcelHeaderProcessor<T>(0));
         processors.add(new Ihr360ExcelRowDataProcessor<T>(1));

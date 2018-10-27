@@ -1,28 +1,29 @@
 package com.ihr360.excel.util.helper;
 
+import com.ihr360.excel.commons.context.Ihr360ExportExcelContext;
+import com.ihr360.excel.commons.context.Ihr360ExportExcelContextHolder;
+import com.ihr360.excel.commons.exception.ExcelException;
+import com.ihr360.excel.commons.specification.MergedRegionSpecification;
+import com.ihr360.excel.config.ExcelDefaultConfig;
 import com.ihr360.excel.core.annotation.ExcelCell;
 import com.ihr360.excel.core.cellstyle.ExcelCellStyle;
 import com.ihr360.excel.core.cellstyle.ExcelCellStyleFactory;
 import com.ihr360.excel.core.cellstyle.Ihr360CellStyle;
-import com.ihr360.excel.config.ExcelDefaultConfig;
-import com.ihr360.excel.commons.context.Ihr360ExportExcelContext;
-import com.ihr360.excel.commons.context.Ihr360ExportExcelContextHolder;
-import com.ihr360.excel.commons.exception.ExcelException;
 import com.ihr360.excel.core.metaData.ExportHeaderParams;
 import com.ihr360.excel.core.metaData.ExportParams;
 import com.ihr360.excel.core.metaData.MergedExportData;
-import com.ihr360.excel.commons.specification.MergedRegionSpecification;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.util.CellRangeAddress;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +115,7 @@ public class Ihr360ExcelSheetHelper {
 
                 //合并单元格
                 List<int[]> specifiCationParams = specification.getSpecifiCationParams();
+
                 for (int[] params : specifiCationParams) {
                     sheet.addMergedRegion(new CellRangeAddress(params[0], params[1], params[2], params[3]));
                 }
@@ -222,7 +224,7 @@ public class Ihr360ExcelSheetHelper {
                         Class clazz = dateTypeIndexMap.get(i);
                         if (clazz != null) {
                             if (clazz.isAssignableFrom(Number.class) || clazz == Date.class) {
-                                cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                                cell.setCellType(CellType.NUMERIC);
                             }
                         }
                         Ihr360ExcelCellHelper.setCellValue(cell, cellDatas.get(i), datePattern, null, textCellStyle, clazz);

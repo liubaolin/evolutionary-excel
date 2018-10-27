@@ -3,6 +3,7 @@ package com.ihr360.excel.core.cellstyle;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import java.util.UUID;
 
@@ -35,6 +36,8 @@ public class Ihr360SSCellStyle implements ExcelCellStyle {
      * 单元格为水平对齐的类型
      */
     private HorizontalAlignment horizontalAlignment;
+
+    private VerticalAlignment verticalAlignment;
 
     private ExcelFont excelFont;
 
@@ -138,6 +141,15 @@ public class Ihr360SSCellStyle implements ExcelCellStyle {
     public HorizontalAlignment getHorizontalAlignment() {
         return horizontalAlignment;
     }
+
+    public VerticalAlignment getVerticalAlignment() {
+        return verticalAlignment;
+    }
+
+    public void setVerticalAlignment(VerticalAlignment verticalAlignment) {
+        this.verticalAlignment = verticalAlignment;
+    }
+
     public ExcelFont getExcelFont() {
         return excelFont;
     }

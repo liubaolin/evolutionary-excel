@@ -11,6 +11,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.util.NumberToTextConverter;
@@ -36,8 +37,8 @@ public class Ihr360ExcelCellHelper {
      */
     public static boolean isNullOrBlankStringCell(Cell cell) {
         return cell == null
-                || cell.getCellType() == Cell.CELL_TYPE_BLANK
-                || (cell.getCellType() == Cell.CELL_TYPE_STRING && StringUtils.isBlank(cell.getStringCellValue()));
+                || cell.getCellType() == CellType.BLANK
+                || (cell.getCellType() == CellType.STRING && StringUtils.isBlank(cell.getStringCellValue()));
     }
 
     /**
@@ -55,22 +56,22 @@ public class Ihr360ExcelCellHelper {
         Ihr360ImportExcelContext excelContext = Ihr360ImportExcelContextHolder.getExcelContext();
         ExcelConfig excelConfig = excelContext.getExcelConfig();
 
-        int cellType = cell.getCellType();
+        CellType cellType = cell.getCellType();
         switch (cellType) {
-            case Cell.CELL_TYPE_BLANK:
+            case BLANK:
                 return null;
-            case Cell.CELL_TYPE_BOOLEAN:
+            case BOOLEAN:
                 return cell.getBooleanCellValue();
-            case Cell.CELL_TYPE_ERROR:
+            case ERROR:
                 return cell.getErrorCellValue();
-            case Cell.CELL_TYPE_FORMULA:
+            case FORMULA:
                 //公式四舍五入保留两位
                 try {
                     return new java.text.DecimalFormat("#.00").format(cell.getNumericCellValue());
                 } catch (Exception e) {
                     return "";
                 }
-            case Cell.CELL_TYPE_NUMERIC:
+            case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {// 判断是日期类型
                     if (cellValueType == String.class) {
                         DataFormatter formatter = Ihr360ExcelCommonExcelHelper.getDataFormatter();
@@ -88,7 +89,7 @@ public class Ihr360ExcelCellHelper {
 
                 }
 
-            case Cell.CELL_TYPE_STRING:
+            case STRING:
                 String cellValue = cell.getStringCellValue();
                 if (StringUtils.isNotBlank(cellValue) && excelConfig != null && StringUtils.isNotEmpty(excelConfig.globalRemovePattern())) {
                     cellValue = cellValue.trim().replaceAll(excelConfig.globalRemovePattern(), "");
@@ -135,7 +136,7 @@ public class Ihr360ExcelCellHelper {
             }
 
         } else if (value instanceof Float || Float.class == clazz) {
-            cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+            cell.setCellType(CellType.NUMERIC);
             String tempStrValue = value == null ? StringUtils.EMPTY : value.toString();
             if (StringUtils.isNotBlank(tempStrValue)) {
                 Float floatValue = Float.parseFloat(tempStrValue);
@@ -144,7 +145,7 @@ public class Ihr360ExcelCellHelper {
                 cell.setCellValue(StringUtils.EMPTY);
             }
         } else if (value instanceof Double || Double.class == clazz) {
-            cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+            cell.setCellType(CellType.NUMERIC);
             String tempStrValue = value == null ? StringUtils.EMPTY : value.toString();
             if (StringUtils.isNotBlank(tempStrValue)) {
                 Double doubleValue = Double.parseDouble(tempStrValue);
@@ -155,7 +156,7 @@ public class Ihr360ExcelCellHelper {
 
         } else if (value instanceof Long || Long.class == clazz) {
 
-            cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+            cell.setCellType(CellType.NUMERIC);
             String tempStrValue = value == null ? StringUtils.EMPTY : value.toString();
             if (StringUtils.isNotBlank(tempStrValue)) {
                 Long langValue = Long.parseLong(tempStrValue);
@@ -169,7 +170,7 @@ public class Ihr360ExcelCellHelper {
             cell.setCellValue(bValue);
         } else if (value instanceof Date) {
             Date date = (Date) value;
-            cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+            cell.setCellType(CellType.NUMERIC);
             textValue = Ihr360ExcelDateFormatUtil.formatDate(pattern, date.getTime());
         }
         //TODO 暂不支持数组导出
@@ -212,7 +213,7 @@ public class Ihr360ExcelCellHelper {
         if (textValue != null) {
             if (NumberUtils.isCreatable(textValue)) {
                 NumberUtils.createNumber(textValue);
-                cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                cell.setCellType(CellType.NUMERIC);
                 cell.setCellValue(NumberUtils.createDouble(textValue));
             } else {
                 HSSFRichTextString richString = new HSSFRichTextString(textValue);
@@ -224,7 +225,7 @@ public class Ihr360ExcelCellHelper {
 
 
     public static void addCellDataToMap(Map<String, Object> flexFieldDataMap, String header, Cell cell, Class specificationType) throws ParseException {
-        if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
+        if (cell == null || cell.getCellType() == CellType.BLANK) {
             flexFieldDataMap.put(header, null);
         } else {
             Object value = Ihr360ExcelCellHelper.getCellValue(cell, specificationType);

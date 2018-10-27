@@ -11,6 +11,7 @@ import com.ihr360.excel.util.date.Ihr360ExcelDateParser;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 
 import java.lang.reflect.Field;
 import java.sql.Time;
@@ -26,6 +27,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static org.apache.poi.ss.usermodel.CellType.BLANK;
 
 /**
  * @author richey
@@ -69,7 +72,7 @@ public class Ihr360ExcelValidatorHelper {
         }
 
         CellTypeMode cellTypeMode = annoCell.cellTypeMode();
-        Integer[] cellTypeArr = null;
+        CellType[] cellTypeArr = null;
 
         if (CellTypeMode.LOOSE == cellTypeMode) {
             cellTypeArr = ExcelDefaultConfig.looseValidateMap.get(field.getType());
@@ -89,11 +92,11 @@ public class Ihr360ExcelValidatorHelper {
             return false;
 
         }
-        if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
+        if (cell == null || cell.getCellType() == BLANK) {
             return true;
         }
 
-        List<Integer> cellTypes = Arrays.asList(cellTypeArr);
+        List<CellType> cellTypes = Arrays.asList(cellTypeArr);
         // 如果了类型不在指定范围内
         if (!cellTypes.contains(cell.getCellType())) {
             handleCellTypeLog(localeHeaderName, cellTypes, logItems);
@@ -102,13 +105,13 @@ public class Ihr360ExcelValidatorHelper {
 
         // 类型符合验证,但值不在要求范围内的
         // String in
-        if (excelValid.in().length != 0 && cell.getCellType() == Cell.CELL_TYPE_STRING) {
+        if (excelValid.in().length != 0 && cell.getCellType() == CellType.STRING) {
             return checkExcelValidIn(cell, localeHeaderName, excelValid, logItems);
         }
         // 数值型 或 可以转为数值的String
-        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC || cell.getCellType() == Cell.CELL_TYPE_STRING) {
+        if (cell.getCellType() == CellType.NUMERIC || cell.getCellType() == CellType.STRING) {
             double cellValue;
-            if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+            if (cell.getCellType() == CellType.STRING) {
                 String cellValueStr = cell.getStringCellValue();
                 if (matchNumber(cellValueStr)) {
                     cellValue = Double.parseDouble(cellValueStr);
@@ -203,10 +206,10 @@ public class Ihr360ExcelValidatorHelper {
         return !Ihr360ExcelCellHelper.isNullOrBlankStringCell(cell) || (Ihr360ExcelCellHelper.isNullOrBlankStringCell(cell) && allowNull);
     }
 
-    public static void handleCellTypeLog(String localeHeaderName, List<Integer> cellTypes, List<ExcelLogItem> logItems) {
+    public static void handleCellTypeLog(String localeHeaderName, List<CellType> cellTypes, List<ExcelLogItem> logItems) {
         StringBuilder strType = new StringBuilder();
         for (int i = 0; i < cellTypes.size(); i++) {
-            Integer cellType = cellTypes.get(i);
+            CellType cellType = cellTypes.get(i);
             strType.append(getCellTypeByInt(cellType));
             if (i != cellTypes.size() - 1) {
                 strType.append(",");
@@ -224,21 +227,22 @@ public class Ihr360ExcelValidatorHelper {
      * 获取cell类型的文字描述
      *
      * @param cellType <pre>
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @return
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @return
      */
-    public static String getCellTypeByInt(int cellType) {
+    public static String getCellTypeByInt(CellType cellType) {
+
         switch (cellType) {
-            case Cell.CELL_TYPE_BLANK:
+            case BLANK:
                 return "Null type";
-            case Cell.CELL_TYPE_BOOLEAN:
+            case BOOLEAN:
                 return "Boolean type";
-            case Cell.CELL_TYPE_ERROR:
+            case ERROR:
                 return "Error type";
-            case Cell.CELL_TYPE_FORMULA:
+            case FORMULA:
                 return "Formula type";
-            case Cell.CELL_TYPE_NUMERIC:
+            case NUMERIC:
                 return "Numeric type or String type or Date type";
-            case Cell.CELL_TYPE_STRING:
+            case STRING:
                 return "String type or Numeric type or String type or Date type";
             default:
                 return "Unknown type";
@@ -253,19 +257,20 @@ public class Ihr360ExcelValidatorHelper {
      */
     public static boolean checkBySpecificationType(Class clazz, Cell cell) {
 
-        int cellType = cell.getCellType();
+        CellType cellType = cell.getCellType();
         switch (cellType) {
-            case Cell.CELL_TYPE_BLANK:
+            case BLANK:
                 return true;
-            case Cell.CELL_TYPE_BOOLEAN:
+            case BOOLEAN:
                 if (clazz != Boolean.class) {
                     return false;
                 }
-            case Cell.CELL_TYPE_ERROR:
                 return true;
-            case Cell.CELL_TYPE_FORMULA:
+            case ERROR:
                 return true;
-            case Cell.CELL_TYPE_NUMERIC:
+            case FORMULA:
+                return true;
+            case NUMERIC:
                 if (clazz != Double.class
                         && clazz != Long.class
                         && clazz != Integer.class
@@ -276,7 +281,7 @@ public class Ihr360ExcelValidatorHelper {
                     return false;
                 }
                 return true;
-            case Cell.CELL_TYPE_STRING:
+            case STRING:
                 if (clazz == Date.class
                         || clazz == Timestamp.class
                         || clazz == Time.class) {

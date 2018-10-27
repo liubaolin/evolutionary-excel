@@ -1,15 +1,14 @@
 package com.ihr360.excel.commons.context;
 
 import com.google.common.collect.Maps;
-import com.ihr360.excel.core.annotation.ExcelConfig;
 import com.ihr360.excel.commons.exception.ExcelException;
 import com.ihr360.excel.commons.logs.ExcelCommonLog;
 import com.ihr360.excel.commons.logs.ExcelLogItem;
 import com.ihr360.excel.commons.logs.ExcelLogType;
 import com.ihr360.excel.commons.logs.ExcelLogs;
+import com.ihr360.excel.core.annotation.ExcelConfig;
 import com.ihr360.excel.core.metaData.ImportParams;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -17,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
@@ -119,18 +117,9 @@ public class Ihr360ImportExcelContext<T> implements Serializable {
         } catch (EncryptedDocumentException e) {
             logger.info(e.getMessage());
             excelLogItems.add(ExcelLogItem.createExcelItem(ExcelLogType.EXCEL_COMMON_ENCRYPTED, null));
-        } catch (InvalidFormatException e) {
-            logger.info(e.getMessage());
-            excelLogItems.add(ExcelLogItem.createExcelItem(ExcelLogType.EXCEL_COMMON_FORMAT_ENCRYPTED, null));
-        } catch (Exception e) {
+        }  catch (Exception e) {
             logger.error("load excel file error", e);
             excelLogItems.add(ExcelLogItem.createExcelItem(ExcelLogType.EXCEL_COMMON_COMMON, null));
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                logger.error(e.toString());
-            }
         }
 
         return currentWorkbook;

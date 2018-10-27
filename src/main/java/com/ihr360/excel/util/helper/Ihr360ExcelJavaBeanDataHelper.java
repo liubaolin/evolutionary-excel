@@ -21,6 +21,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -292,9 +293,9 @@ public class Ihr360ExcelJavaBeanDataHelper {
 
         Object cellValue = Ihr360ExcelCellHelper.getCellValue(cell, null);
         // String类型的日期转换
-        if (Date.class == field.getType() && cell.getCellType() == Cell.CELL_TYPE_STRING) {
+        if (Date.class == field.getType() && cell.getCellType() == CellType.STRING) {
             excelValueObj = Ihr360ExcelDateParser.getDate(String.valueOf(cellValue));
-        } else if (Timestamp.class == field.getType() && cell.getCellType() == Cell.CELL_TYPE_STRING) {
+        } else if (Timestamp.class == field.getType() && cell.getCellType() == CellType.STRING) {
             excelValueObj = Ihr360ExcelDateParser.getTimestamp(String.valueOf(cellValue));
         } else if (Integer.class == field.getType()) {
             return Integer.parseInt(String.valueOf(cellValue));

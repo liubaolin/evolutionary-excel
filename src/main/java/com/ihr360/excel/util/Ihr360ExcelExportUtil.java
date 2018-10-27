@@ -1,8 +1,9 @@
 package com.ihr360.excel.util;
 
-import com.ihr360.excel.core.cellstyle.ExcelCellStyle;
 import com.ihr360.excel.commons.context.Ihr360ExportExcelContext;
 import com.ihr360.excel.commons.context.Ihr360ExportExcelContextHolder;
+import com.ihr360.excel.commons.exception.ExcelException;
+import com.ihr360.excel.core.cellstyle.ExcelCellStyle;
 import com.ihr360.excel.core.metaData.ExcelSheet;
 import com.ihr360.excel.core.metaData.ExportParams;
 import org.apache.commons.collections.CollectionUtils;
@@ -44,42 +45,15 @@ public class Ihr360ExcelExportUtil {
      * @param out 与输出设备关联的流对象，可以将EXCEL文档导出到本地文件或者网络中
      */
     public static <T> void exportExcel(ExportParams<T> exportParams, OutputStream out) {
-        Ihr360ExportExcelContextHolder.initExportContext(true, exportParams, out);
-        exportExcel();
-    }
-
-
-    /**
-     * 利用JAVA的反射机制，将放置在JAVA集合中并且符合一定条件的数据以EXCEL 的形式输出到指定IO设备上<br>
-     * 用于多个sheet
-     *
-     * @param <T>
-     */
-    private static <T> void exportExcel() {
-
-        Ihr360ExportExcelContext<T> excelContext = Ihr360ExportExcelContextHolder.getExcelContext();
-        ExportParams<T> exportParams = excelContext.getExportParams();
-        List<ExcelSheet<T>> sheets = exportParams.getSheets();
-
-        if (CollectionUtils.isEmpty(sheets)) {
-            write2Sheet();
-        } else {
-            Map<String, ExcelCellStyle> headerStyleMap = exportParams.getHeaderStyleMap();
-            Workbook workbook = excelContext.getCurrentWorkbook();
-            for (ExcelSheet<T> sheet : sheets) {
-                // 生成一个表格
-                Sheet sheetItem = workbook.createSheet(sheet.getSheetName());
-                excelContext.setCurrentSheet(sheetItem);
-                ExportParams<T> itemExportParams = new ExportParams<>();
-                itemExportParams.setHeaderMap(sheet.getHeaders());
-                itemExportParams.setRowDatas(sheet.getDataset());
-                itemExportParams.setHeaderStyleMap(headerStyleMap);
-                itemExportParams.setDataTypeMap(sheet.getDataTypeMap());
-                excelContext.setExportParams(itemExportParams);
-                write2Sheet();
-            }
+        try {
+            Ihr360ExportExcelContextHolder.initExportContext(true, exportParams, out);
+            exportExcel();
+        } catch (Exception e) {
+            logger.error(e.toString());
+            throw new ExcelException(e);
+        } finally {
+            Ihr360ExportExcelContextHolder.clean();
         }
-        writeWorkbook();
     }
 
 
@@ -120,6 +94,9 @@ public class Ihr360ExcelExportUtil {
             workbook.write(out);
         } catch (IOException e) {
             logger.error(e.toString(), e);
+            throw new ExcelException(e);
+        }finally {
+            Ihr360ExportExcelContextHolder.clean();
         }
     }
 
@@ -131,10 +108,43 @@ public class Ihr360ExcelExportUtil {
             workbook.write(excelContext.getOutputStream());
         } catch (Exception e) {
             logger.error(e.toString(), e);
-        } finally {
-            Ihr360ExportExcelContextHolder.clean();
         }
     }
+
+    /**
+     * 利用JAVA的反射机制，将放置在JAVA集合中并且符合一定条件的数据以EXCEL 的形式输出到指定IO设备上<br>
+     * 用于多个sheet
+     *
+     * @param <T>
+     */
+    private static <T> void exportExcel() {
+
+        Ihr360ExportExcelContext<T> excelContext = Ihr360ExportExcelContextHolder.getExcelContext();
+        ExportParams<T> exportParams = excelContext.getExportParams();
+        List<ExcelSheet<T>> sheets = exportParams.getSheets();
+
+        if (CollectionUtils.isEmpty(sheets)) {
+            write2Sheet();
+        } else {
+            Map<String, ExcelCellStyle> headerStyleMap = exportParams.getHeaderStyleMap();
+            Workbook workbook = excelContext.getCurrentWorkbook();
+            for (ExcelSheet<T> sheet : sheets) {
+                // 生成一个表格
+                Sheet sheetItem = workbook.createSheet(sheet.getSheetName());
+                excelContext.setCurrentSheet(sheetItem);
+                ExportParams<T> itemExportParams = new ExportParams<>();
+                itemExportParams.setHeaderMap(sheet.getHeaders());
+                itemExportParams.setRowDatas(sheet.getDataset());
+                itemExportParams.setHeaderStyleMap(headerStyleMap);
+                itemExportParams.setDataTypeMap(sheet.getDataTypeMap());
+                excelContext.setExportParams(itemExportParams);
+                write2Sheet();
+            }
+        }
+        writeWorkbook();
+    }
+
+
 
 
 }
