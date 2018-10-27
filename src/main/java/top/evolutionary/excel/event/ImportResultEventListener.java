@@ -1,0 +1,26 @@
+package top.evolutionary.excel.event;
+
+import top.evolutionary.excel.commons.context.Ihr360ImportExcelContext;
+
+import java.util.Collection;
+
+/**
+ * @author richey
+ */
+public abstract class ImportResultEventListener<T> {
+
+    /**
+     * when finish read excel(get the result) trigger invoke function
+     *
+     * @param result 结果集合
+     */
+    public abstract void invoke(Collection<T> result);
+
+    /**
+     * if have something to do after get result
+     *
+     * @param excelContext
+     */
+    public abstract void doAfterGetResult(Ihr360ImportExcelContext<T> excelContext);
+
+}
